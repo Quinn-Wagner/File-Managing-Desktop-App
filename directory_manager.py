@@ -3,14 +3,16 @@ import shutil
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
 from ui_components import setup_ui
 
+from ui_components import setup_ui
+
 class FileMoverApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("File Mover App")
         self.setGeometry(100, 100, 850, 500)
 
-        self.source_dir_edit, self.source_dir_button, self.source_file_list, \
-        self.target_dir_edit, self.target_dir_button, self.target_file_list, \
+        self.source_dir_edit, self.source_dir_button, self.source_file_list, self.source_sort_dropdown, \
+        self.target_dir_edit, self.target_dir_button, self.target_file_list, self.target_sort_dropdown, \
         self.move_button = setup_ui(self)
 
         self.source_dir_button.clicked.connect(self.select_source_directory)

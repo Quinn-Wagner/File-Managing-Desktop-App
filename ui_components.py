@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (
-    QVBoxLayout, QHBoxLayout, QPushButton, QWidget, QLabel, QLineEdit, QListWidget
+    QVBoxLayout, QHBoxLayout, QPushButton, QWidget, QLabel, QLineEdit, QListWidget, QComboBox
 )
 from PyQt5.QtCore import Qt
 
@@ -13,11 +13,11 @@ def setup_ui(window):
     
     directory_layout = QHBoxLayout()
     
-    source_dir_edit, source_dir_button, source_file_list = create_directory_widgets("Source Directory:")
-    directory_layout.addLayout(create_directory_layout("Source Directory:", source_dir_edit, source_dir_button, source_file_list))
+    source_dir_edit, source_dir_button, source_file_list, source_sort_dropdown = create_directory_widgets("Source Directory:")
+    directory_layout.addLayout(create_directory_layout("Source Directory:", source_dir_edit, source_dir_button, source_file_list, source_sort_dropdown))
     
-    target_dir_edit, target_dir_button, target_file_list = create_directory_widgets("Target Directory:")
-    directory_layout.addLayout(create_directory_layout("Target Directory:", target_dir_edit, target_dir_button, target_file_list))
+    target_dir_edit, target_dir_button, target_file_list, target_sort_dropdown = create_directory_widgets("Target Directory:")
+    directory_layout.addLayout(create_directory_layout("Target Directory:", target_dir_edit, target_dir_button, target_file_list, target_sort_dropdown))
     
     main_layout.addLayout(directory_layout)
     
@@ -27,23 +27,33 @@ def setup_ui(window):
     
     central_widget.setLayout(main_layout)
     
-    return source_dir_edit, source_dir_button, source_file_list, \
-           target_dir_edit, target_dir_button, target_file_list, move_button
+    return source_dir_edit, source_dir_button, source_file_list, source_sort_dropdown, \
+           target_dir_edit, target_dir_button, target_file_list, target_sort_dropdown, move_button
 
 def create_directory_widgets(label_text):
     dir_edit = QLineEdit()
     dir_edit.setReadOnly(True)
     dir_button = QPushButton(f"Browse {label_text.split()[0]}")
     file_list = QListWidget()
-    return dir_edit, dir_button, file_list
+    sort_dropdown = QComboBox()
+    sort_dropdown.addItems([
+        "Sort by File Type (Ascending)",
+        "Sort by File Type (Descending)",
+        "Sort Alphabetically (Ascending)",
+        "Sort Alphabetically (Descending)",
+        "Sort by Last Modified Date (Ascending)",
+        "Sort by Last Modified Date (Descending)"
+    ])
+    return dir_edit, dir_button, file_list, sort_dropdown
 
-def create_directory_layout(label_text, dir_edit, dir_button, file_list):
+def create_directory_layout(label_text, dir_edit, dir_button, file_list, sort_dropdown):
     layout = QVBoxLayout()
     button_layout = QHBoxLayout()
     button_layout.addWidget(dir_edit)
     button_layout.addWidget(dir_button)
     layout.addWidget(QLabel(label_text))
     layout.addLayout(button_layout)
+    layout.addWidget(sort_dropdown)
     layout.addWidget(QLabel(f"{label_text} Files:"))
     layout.addWidget(file_list)
     return layout
