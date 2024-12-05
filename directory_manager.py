@@ -6,7 +6,7 @@ from ui_components import setup_ui
 class FileMoverApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("File Mover App")
+        self.setWindowTitle("File Managing App")
         self.setGeometry(100, 100, 850, 500)
 
         self.source_dir_edit, self.source_dir_button, self.source_sort_dropdown, self.source_file_list, \
