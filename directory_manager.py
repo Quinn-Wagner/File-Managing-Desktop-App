@@ -54,8 +54,10 @@ class FileMoverApp(QMainWindow):
         return response == QMessageBox.Yes
 
     def move_selected_files(self):
-        selected_items = self.source_file_list.selectedItems()
-        if not selected_items:
+        source_selected_items = self.source_file_list.selectedItems()
+        target_selected_items = self.target_file_list.selectedItems()
+
+        if not source_selected_items and not target_selected_items:
             QMessageBox.warning(self, "Warning", "No files or directories selected to move.")
             return
 
@@ -66,7 +68,7 @@ class FileMoverApp(QMainWindow):
             QMessageBox.warning(self, "Warning", "Please select both source and target directories.")
             return
 
-        for item in selected_items:
+        for item in source_selected_items:
             file_name = item.text()
             source_file_path = os.path.join(source_directory, file_name)
             target_file_path = os.path.join(target_directory, file_name)
@@ -81,22 +83,34 @@ class FileMoverApp(QMainWindow):
                     QMessageBox.warning(self, "Error", f"Error moving file '{file_name}': {str(e)}")
                     continue
 
+        for item in target_selected_items:
+            file_name = item.text()
+            target_file_path = os.path.join(target_directory, file_name)
+            source_file_path = os.path.join(source_directory, file_name)
+
+            if self.confirm_action("move", file_name):
+                try:
+                    shutil.move(target_file_path, source_file_path)
+                except PermissionError:
+                    QMessageBox.warning(self, "Permission Denied", f"You do not have permission to move '{file_name}'.")
+                    continue
+                except Exception as e:
+                    QMessageBox.warning(self, "Error", f"Error moving file '{file_name}': {str(e)}")
+                    continue
+
         self.load_files(source_directory, self.source_file_list)
         self.load_files(target_directory, self.target_file_list)
 
     def delete_selected_files(self):
-        selected_items = self.source_file_list.selectedItems()
-        if not selected_items:
+        source_selected_items = self.source_file_list.selectedItems()
+        target_selected_items = self.target_file_list.selectedItems()
+
+        if not source_selected_items and not target_selected_items:
             QMessageBox.warning(self, "Warning", "No files or directories selected to delete.")
             return
 
         source_directory = self.source_dir_edit.text()
-
-        if not source_directory:
-            QMessageBox.warning(self, "Warning", "Please select a source directory.")
-            return
-
-        for item in selected_items:
+        for item in source_selected_items:
             file_name = item.text()
             file_path = os.path.join(source_directory, file_name)
 
@@ -120,22 +134,46 @@ class FileMoverApp(QMainWindow):
                         QMessageBox.warning(self, "Error", f"Error deleting file '{file_name}': {str(e)}")
                         continue
 
+        target_directory = self.target_dir_edit.text()
+        for item in target_selected_items:
+            file_name = item.text()
+            file_path = os.path.join(target_directory, file_name)
+
+            if self.confirm_action("delete", file_name):
+                if self.is_directory(file_path):
+                    try:
+                        shutil.rmtree(file_path)
+                    except PermissionError:
+                        QMessageBox.warning(self, "Permission Denied", f"You do not have permission to delete '{file_name}'.")
+                        continue
+                    except Exception as e:
+                        QMessageBox.warning(self, "Error", f"Error deleting directory '{file_name}': {str(e)}")
+                        continue
+                else:
+                    try:
+                        os.remove(file_path)
+                    except PermissionError:
+                        QMessageBox.warning(self, "Permission Denied", f"You do not have permission to delete '{file_name}'.")
+                        continue
+                    except Exception as e:
+                        QMessageBox.warning(self, "Error", f"Error deleting file '{file_name}': {str(e)}")
+                        continue
+
         self.load_files(source_directory, self.source_file_list)
+        self.load_files(target_directory, self.target_file_list)
 
     def copy_selected_files(self):
-        selected_items = self.source_file_list.selectedItems()
-        if not selected_items:
+        source_selected_items = self.source_file_list.selectedItems()
+        target_selected_items = self.target_file_list.selectedItems()
+
+        if not source_selected_items and not target_selected_items:
             QMessageBox.warning(self, "Warning", "No files or directories selected to copy.")
             return
 
         source_directory = self.source_dir_edit.text()
         target_directory = self.target_dir_edit.text()
 
-        if not source_directory or not target_directory:
-            QMessageBox.warning(self, "Warning", "Please select both source and target directories.")
-            return
-
-        for item in selected_items:
+        for item in source_selected_items:
             file_name = item.text()
             source_file_path = os.path.join(source_directory, file_name)
             target_file_path = os.path.join(target_directory, file_name)
@@ -153,6 +191,31 @@ class FileMoverApp(QMainWindow):
                 else:
                     try:
                         shutil.copy(source_file_path, target_file_path)
+                    except PermissionError:
+                        QMessageBox.warning(self, "Permission Denied", f"You do not have permission to copy '{file_name}'.")
+                        continue
+                    except Exception as e:
+                        QMessageBox.warning(self, "Error", f"Error copying file '{file_name}': {str(e)}")
+                        continue
+
+        for item in target_selected_items:
+            file_name = item.text()
+            target_file_path = os.path.join(target_directory, file_name)
+            source_file_path = os.path.join(source_directory, file_name)
+
+            if self.confirm_action("copy", file_name):
+                if self.is_directory(target_file_path):
+                    try:
+                        shutil.copytree(target_file_path, source_file_path)
+                    except PermissionError:
+                        QMessageBox.warning(self, "Permission Denied", f"You do not have permission to copy '{file_name}'.")
+                        continue
+                    except Exception as e:
+                        QMessageBox.warning(self, "Error", f"Error copying directory '{file_name}': {str(e)}")
+                        continue
+                else:
+                    try:
+                        shutil.copy(target_file_path, source_file_path)
                     except PermissionError:
                         QMessageBox.warning(self, "Permission Denied", f"You do not have permission to copy '{file_name}'.")
                         continue

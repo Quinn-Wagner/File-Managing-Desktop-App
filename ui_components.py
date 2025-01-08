@@ -10,7 +10,6 @@ from PyQt5.QtWidgets import QFileSystemModel, QAbstractItemView
 def get_resource_path(relative_path):
     """ Get the absolute path to a resource, works for PyInstaller and dev mode """
     try:
-        # PyInstaller extracts files to a temp folder _MEIPASS in onefile mode
         base_path = sys._MEIPASS
     except AttributeError:
         base_path = os.path.abspath(".")
@@ -68,7 +67,7 @@ def setup_ui(window):
 def create_directory_widgets_with_filter(label_text):
     dir_edit = QLineEdit()
     dir_button = QPushButton()
-    dir_button.setIcon(QIcon(get_resource_path("images/folder.png")))  # Use get_resource_path for bundled files
+    dir_button.setIcon(QIcon(get_resource_path("images/folder.png")))
     dir_button.setToolTip(f"Browse {label_text.split()[0]}")
 
     sort_dropdown = QComboBox()
@@ -83,8 +82,6 @@ def create_directory_widgets_with_filter(label_text):
     file_list = QListWidget()
     return dir_edit, dir_button, sort_dropdown, file_list
 
- 
- 
 def create_directory_layout(label_text, dir_edit, dir_button, sort_dropdown, file_list):
     layout = QVBoxLayout()
     button_layout = QHBoxLayout()
@@ -97,7 +94,6 @@ def create_directory_layout(label_text, dir_edit, dir_button, sort_dropdown, fil
     layout.addWidget(file_list)
     return layout
  
- 
 def setup_directory_autocomplete(line_edit, file_list):
     file_model = QFileSystemModel()
     file_model.setRootPath("")
@@ -108,7 +104,6 @@ def setup_directory_autocomplete(line_edit, file_list):
     line_edit.setCompleter(completer)
  
     line_edit.textChanged.connect(lambda text: update_file_list(text, file_list))
- 
  
 def update_file_list(path, file_list):
     file_list.clear()
